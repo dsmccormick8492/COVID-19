@@ -28,14 +28,10 @@ from datetime import datetime
 import scipy.stats as stats
 import pymc3 as pm
 
-import urllib.request
-from io import StringIO
-from datetime import datetime
-
-
+### project imports
+from dataframe_from_csv_url import dataframe_from_csv_url
 
 ### some constants
-ENCODING_TYPE = 'utf-8'
 DATE_COLUMN_START_INDEX = 4
 
 figure_size = (10, 6.5)
@@ -45,34 +41,15 @@ COUNTRY_STR = 'Country/Region'
 STATE_STR = 'Province/State'
 
 
-
-def dataframe_from_url(url_str: str) -> pd.DataFrame:
-    with urllib.request.urlopen(url_str) as response:
-       csv_bytes = response.read()
-    
-    string = str(csv_bytes, ENCODING_TYPE)
-    data = StringIO(string)
-    df = pd.read_csv(data)    
-    
-    return df
-
-
 #%% data sources
 confirmed_url = "https://raw.github.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_19-covid-Confirmed.csv"
 deaths_url = "https://raw.github.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_19-covid-Deaths.csv"
 recovered_url = "https://raw.github.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_19-covid-Recovered.csv"
 
 #%% fetch data
-df_confirmed = dataframe_from_url(confirmed_url)
-df_deaths = dataframe_from_url(deaths_url)
-df_recovered  = dataframe_from_url(recovered_url)
-
-# #%% load data
-# filepath = "./csse_covid_19_data/csse_covid_19_time_series/time_series_19-covid-Confirmed.csv"
-# df_confirmed = pd.read_csv(filepath)
-
-# filepath = "./csse_covid_19_data/csse_covid_19_time_series/time_series_19-covid-Deaths.csv"
-# df_deaths = pd.read_csv(filepath)
+df_confirmed = dataframe_from_csv_url(confirmed_url)
+df_deaths = dataframe_from_csv_url(deaths_url)
+df_recovered  = dataframe_from_csv_url(recovered_url)
 
 #%% parse data
 ### confirmed cases
