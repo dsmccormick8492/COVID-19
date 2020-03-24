@@ -118,6 +118,7 @@ plt.scatter(confirmed_dates, confirmed_totals_us, c='b', label='US only')
 # plt.ylim(0, totals.max())
 plt.xticks(rotation=rotation_angle)
 plt.yscale('log')
+plt.xlim(confirmed_dates[0], confirmed_dates[-1])
 plt.ylim(1, 1e6)
 plt.grid(b=True, which='both', axis='both')
 plt.legend()
@@ -137,6 +138,7 @@ plt.scatter(deaths_dates, deaths_totals_us, c='b', label='US only')
 # plt.ylim(0, totals.max())
 plt.xticks(rotation=rotation_angle)
 plt.yscale('log')
+plt.xlim(confirmed_dates[0], confirmed_dates[-1])
 plt.ylim(1, 2 * deaths_totals.max())
 plt.grid(b=True, which='both', axis='both')
 plt.legend()
@@ -160,14 +162,20 @@ plt.title("Covid-19 confirmed cases and deaths in US")
 plt.show()
 
 
-### MA and NY
+### MA, NY, NJ
+confirmed_dates_start = "3/1/20"
+confirmed_dates_start_dt = datetime.strptime(confirmed_dates_start, "%m/%d/%y")
+confirmed_dates_start_index = confirmed_dates.index(confirmed_dates_start_dt)
+
 plt.figure(figsize=figure_size)
-plt.plot(confirmed_dates, confirmed_totals_ma, c='b', label="MA confirmed cases")    
-plt.plot(confirmed_dates, confirmed_totals_ny, c='firebrick', label="NY confirmed cases")    
-plt.plot(confirmed_dates, confirmed_totals_nj, c='darkgreen', label="NJ confirmed cases")    
-plt.plot(deaths_dates, deaths_totals_ma, c='c', label="MA deaths")    
-plt.plot(deaths_dates, deaths_totals_ny, c='r', label="NY deaths")    
-plt.plot(deaths_dates, deaths_totals_nj, c='limegreen', label="NJ deaths")
+plt.plot(confirmed_dates, confirmed_totals_ma, c='b', marker='o', label="MA confirmed cases")    
+plt.plot(deaths_dates, deaths_totals_ma, c='c', marker='o', label="MA deaths")    
+plt.plot(confirmed_dates, confirmed_totals_ny, c='firebrick', marker='o', label="NY confirmed cases")    
+plt.plot(deaths_dates, deaths_totals_ny, c='r', marker='o', label="NY deaths")    
+plt.plot(confirmed_dates, confirmed_totals_nj, c='darkgreen', marker='o', label="NJ confirmed cases")    
+plt.plot(deaths_dates, deaths_totals_nj, c='limegreen', marker='o', label="NJ deaths")
+plt.xlim(confirmed_dates[confirmed_dates_start_index], confirmed_dates[-1])
+plt.ylim(1e0, 2 * confirmed_totals_ny.max())
 plt.yscale('log')
 plt.xticks(rotation=rotation_angle)
 plt.grid(b=True, which='both', axis='both')
@@ -212,36 +220,36 @@ plt.title(f"regression of confirmed US cases since {confirmed_dates_start}")
 plt.show()
 
 ### deaths start date
-deaths_dates_start = "3/3/20"
-deaths_dates_start_dt = datetime.strptime(deaths_dates_start, "%m/%d/%y")
+# deaths_dates_start = "3/3/20"
+# deaths_dates_start_dt = datetime.strptime(deaths_dates_start, "%m/%d/%y")
 
-deaths_dates_start_index = deaths_dates.index(deaths_dates_start_dt)
-deaths_dates_subset = deaths_dates[deaths_dates_start_index:]
-deaths_dates_subset_count = len(deaths_dates_subset)
-x = np.arange(deaths_dates_subset_count)
-y = np.log10(deaths_totals_us[deaths_dates_start_index:])
-slope, intercept, r_value, p_value, std_err = stats.linregress(x,y)
-y_hat = slope * x + intercept
+# deaths_dates_start_index = deaths_dates.index(deaths_dates_start_dt)
+# deaths_dates_subset = deaths_dates[deaths_dates_start_index:]
+# deaths_dates_subset_count = len(deaths_dates_subset)
+# x = np.arange(deaths_dates_subset_count)
+# y = np.log10(deaths_totals_us[deaths_dates_start_index:])
+# slope, intercept, r_value, p_value, std_err = stats.linregress(x,y)
+# y_hat = slope * x + intercept
 
-plt.figure(figsize=(10, 8))
-plt.scatter(x, y, c='r', label='data')
-plt.plot(x, y_hat, c='r', label=f'regression r={r_value:0.3f}, slope={slope:0.3f}')
-plt.xlabel(f"days since {deaths_dates_start}")
-plt.ylabel("log10(deaths)")
-plt.legend()
-plt.title(f"linear regression of log10(US deaths) since {deaths_dates_start}")
-plt.show()
+# plt.figure(figsize=(10, 8))
+# plt.scatter(x, y, c='r', label='data')
+# plt.plot(x, y_hat, c='r', label=f'regression r={r_value:0.3f}, slope={slope:0.3f}')
+# plt.xlabel(f"days since {deaths_dates_start}")
+# plt.ylabel("log10(deaths)")
+# plt.legend()
+# plt.title(f"linear regression of log10(US deaths) since {deaths_dates_start}")
+# plt.show()
 
-plt.figure(figsize=(10, 6.5))
-plt.scatter(deaths_dates_subset, 10**y, c='r', label='data')
-plt.plot(deaths_dates_subset, 10**y_hat, c='r', label=f'regression r={r_value:0.3f}')
-plt.xlim(deaths_dates_start_dt, deaths_dates[-1])
-plt.xlabel(f"days since {deaths_dates_start}")
-plt.xticks(rotation=rotation_angle)
-plt.ylabel("deaths")
-plt.legend()
-plt.title(f"regression of US deaths since {deaths_dates_start}")
-plt.show()
+# plt.figure(figsize=(10, 6.5))
+# plt.scatter(deaths_dates_subset, 10**y, c='r', label='data')
+# plt.plot(deaths_dates_subset, 10**y_hat, c='r', label=f'regression r={r_value:0.3f}')
+# plt.xlim(deaths_dates_start_dt, deaths_dates[-1])
+# plt.xlabel(f"days since {deaths_dates_start}")
+# plt.xticks(rotation=rotation_angle)
+# plt.ylabel("deaths")
+# plt.legend()
+# plt.title(f"regression of US deaths since {deaths_dates_start}")
+# plt.show()
 
 #%% pymc3 MCMC model for regression
 basic_model = pm.Model()
@@ -253,7 +261,7 @@ with basic_model:
     intercept_mc = pm.Uniform('intercept_mc', lower=1.5, upper=2)
     # sigma_mc = pm.Normal('sigma_mc', mu=0.05, sigma=0.02)
     # sigma_mc = pm.HalfNormal('sigma_mc', sigma=0.2)
-    sigma_mc = pm.Uniform('sigma_mc', lower=0.01, upper=0.08)
+    sigma_mc = pm.Uniform('sigma_mc', lower=0.001, upper=0.08)
 
     # Expected value of outcome
     expected_value = slope_mc * x + intercept_mc
