@@ -22,6 +22,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 #import seaborn as sns
 
+from math import log
 from datetime import datetime
 
 # from scipy.optimize import least_squares
@@ -39,6 +40,12 @@ rotation_angle = 0
 
 COUNTRY_STR = 'Country/Region'
 STATE_STR = 'Province/State'
+
+#%% functions
+def days_to_double(exponent: float) -> float:
+    days = log(2) / log(10**exponent)
+    
+    return days
 
 
 #%% data sources
@@ -107,7 +114,7 @@ deaths_grouped_by_state = df_deaths.groupby(STATE_STR)
 death_groups_states = dict(list(deaths_grouped_by_state))
 
 #%% Plots!
-### connfirmed cases
+### confirmed cases
 plt.figure(figsize=figure_size)
 plt.scatter(confirmed_dates, confirmed_totals, label='Total')
 plt.scatter(confirmed_dates, confirmed_totals_china, c='m', label='Mainland China')
@@ -199,9 +206,11 @@ y = np.log10(confirmed_totals_us[confirmed_dates_start_index:])
 slope, intercept, r_value, p_value, std_err = stats.linregress(x,y)
 y_hat = slope * x + intercept
 
+doubling_days = days_to_double(slope)
+
 plt.figure(figsize=(10, 8))
 plt.scatter(x, y, label='data')
-plt.plot(x, y_hat, c='b', label=f'regression r={r_value:0.3f}, slope={slope:0.3f}')
+plt.plot(x, y_hat, c='b', label=f'regression r={r_value:0.3f}, slope={slope:0.3f}, days to double={doubling_days:0.2f}')
 plt.xlabel(f"days since {confirmed_dates_start}")
 plt.ylabel("log10(confirmed cases)")
 plt.legend()
@@ -210,7 +219,7 @@ plt.show()
 
 plt.figure(figsize=(10, 6.5))
 plt.scatter(confirmed_dates_subset, 10**y, label='data')
-plt.plot(confirmed_dates_subset, 10**y_hat, c='b', label=f'regression r={r_value:0.3f}')
+plt.plot(confirmed_dates_subset, 10**y_hat, c='b', label=f'regression r={r_value:0.3f}, days to double={doubling_days:0.2f}')
 plt.xlim(confirmed_dates_start_dt, confirmed_dates[-1])
 plt.xlabel(f"days since {confirmed_dates_start}")
 plt.xticks(rotation=rotation_angle)
@@ -276,7 +285,7 @@ with basic_model:
     # draw 500 posterior samples
     trace = pm.sample(500, target_accept=0.95)
     pm.traceplot(trace, compact=False)
-    pm.plot_posterior(trace)
+    pm.plot_posterior(trace, round_to=4)
     plt.show()
     
 y_map = map_estimate['slope_mc'] * x + map_estimate['intercept_mc']
