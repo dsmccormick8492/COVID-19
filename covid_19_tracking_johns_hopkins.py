@@ -22,7 +22,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 #import seaborn as sns
 
-from math import log
+from math import log, log10
 from datetime import datetime
 
 # from scipy.optimize import least_squares
@@ -43,28 +43,21 @@ STATE_STR = 'Province/State'
 
 #%% functions
 def days_to_double(exponent: float) -> float:
-    days = log(2) / log(10**exponent)
-    
-    return days
+    return log(2) / log(10**exponent)
 
 
-# def double_in_days_exponent(days_to_double: int) -> float:
-#     a = days_to_double
-#     # WolframAlpha solution
-#     # y = (log(2^(1/a)))/log(10)
-#     # exponent = (log(2**(1 / days_to_double))) / log(10)
-#     exponent = log(2) / (days_to_double * log(10))
+def double_in_days_exponent(days_to_double: int) -> float:
+    exponent = log10(2) / days_to_double
     
-#     return exponent
+    return exponent
 
 # tests
-# exp_test = 0.301
-# d2d = days_to_double(exp_test)
+# d2d = 1.0
+# exponent = double_in_days_exponent(d2d)
+# print(f'days to double = {d2d} => exponent = {exponent}')
+
+# d2d = days_to_double(exponent)
 # print(f'exponent={exp_test} => days to double = {d2d}')
-
-# d2d = 2.0
-# print(f'days to double = {d2d} => exponent = {double_in_days_exponent(d2d)}')
-
 
 #%% data sources
 
