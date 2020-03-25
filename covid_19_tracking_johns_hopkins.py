@@ -48,15 +48,32 @@ def days_to_double(exponent: float) -> float:
     return days
 
 
+# def double_in_days_exponent(days_to_double: int) -> float:
+#     a = days_to_double
+#     # WolframAlpha solution
+#     # y = (log(2^(1/a)))/log(10)
+#     # exponent = (log(2**(1 / days_to_double))) / log(10)
+#     exponent = log(2) / (days_to_double * log(10))
+    
+#     return exponent
+
+# tests
+# exp_test = 0.301
+# d2d = days_to_double(exp_test)
+# print(f'exponent={exp_test} => days to double = {d2d}')
+
+# d2d = 2.0
+# print(f'days to double = {d2d} => exponent = {double_in_days_exponent(d2d)}')
+
+
 #%% data sources
-confirmed_url = "https://raw.github.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_19-covid-Confirmed.csv"
-deaths_url = "https://raw.github.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_19-covid-Deaths.csv"
-recovered_url = "https://raw.github.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_19-covid-Recovered.csv"
+
+confirmed_url = "https://raw.github.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_global.csv"
+deaths_url = "https://raw.github.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_deaths_global.csv"
 
 #%% fetch data
 df_confirmed = dataframe_from_csv_url(confirmed_url)
 df_deaths = dataframe_from_csv_url(deaths_url)
-df_recovered  = dataframe_from_csv_url(recovered_url)
 
 #%% parse data
 ### confirmed cases
@@ -208,6 +225,7 @@ y_hat = slope * x + intercept
 
 doubling_days = days_to_double(slope)
 
+#TODO: add lines for days to double
 plt.figure(figsize=(10, 8))
 plt.scatter(x, y, label='data')
 plt.plot(x, y_hat, c='b', label=f'regression r={r_value:0.3f}, slope={slope:0.3f}, days to double={doubling_days:0.2f}')
@@ -229,6 +247,7 @@ plt.title(f"regression of confirmed US cases since {confirmed_dates_start}")
 plt.show()
 
 ### deaths start date
+#TODO: regression on death rates
 # deaths_dates_start = "3/3/20"
 # deaths_dates_start_dt = datetime.strptime(deaths_dates_start, "%m/%d/%y")
 
