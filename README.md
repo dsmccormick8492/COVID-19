@@ -5,7 +5,7 @@ Plotting and modeling of COVID-19 pandemic using web-accessible data from offici
 Main site: https://gisanddata.maps.arcgis.com/apps/opsdashboard/index.html#/bda7594740fd40299423467b48e9ecf6  
 Data on Github: https://github.com/CSSEGISandData/COVID-19/  
 
-2020.03.26 data reporting changed to no state-level data for US in main files
+2020.03.22 data reporting changed to no state-level data for US in main files, added Admin2 and FIPS 
 state-level data still reported in daily reports
 
 ## The COVID Tracking Project

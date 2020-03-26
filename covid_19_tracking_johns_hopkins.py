@@ -224,10 +224,15 @@ doubling_days = days_to_double(slope_confirmed)
 slope_2_days = double_in_days_exponent(2)
 slope_3_days = double_in_days_exponent(3)
 
+y_double_2_days = slope_2_days * x_confirmed + y_confirmed[0]
+y_double_3_days = slope_3_days * x_confirmed + y_confirmed[0]
+
 #TODO: add lines for days to double
 plt.figure(figsize=(10, 8))
 plt.scatter(x_confirmed, y_confirmed, label='data')
-plt.plot(x_confirmed, y_hat_confirmed, c='b', label=f'regression r={r_value:0.3f}, slope={slope_confirmed:0.3f}, days to double={doubling_days:0.1f}')
+plt.plot(x_confirmed, y_hat_confirmed, c='b', label=f'regresson r={r_value:0.3f}, slope={slope_confirmed:0.3f}, days to double={doubling_days:0.1f}')
+plt.plot(x_confirmed, y_double_2_days, c='k', linestyle='--', label="double in 2 days")
+plt.plot(x_confirmed, y_double_3_days, c='k', linestyle='-.', label="double in 3 days")
 plt.xlabel(f"days since {confirmed_dates_start}")
 plt.ylabel("log10(confirmed cases)")
 plt.legend()
@@ -237,6 +242,8 @@ plt.show()
 plt.figure(figsize=(10, 6.5))
 plt.scatter(confirmed_dates_subset, 10**y_confirmed, label='data')
 plt.plot(confirmed_dates_subset, 10**y_hat_confirmed, c='b', label=f'regression r={r_value:0.3f}, days to double={doubling_days:0.1f}')
+plt.plot(confirmed_dates_subset, 10**y_double_2_days, c='k', linestyle='--', label="double in 2 days")
+plt.plot(confirmed_dates_subset, 10**y_double_3_days, c='k', linestyle='-.', label="double in 3 days")
 plt.xlim(confirmed_dates_start_dt, confirmed_dates[-1])
 plt.xlabel(f"days since {confirmed_dates_start}")
 plt.xticks(rotation=rotation_angle)
@@ -259,10 +266,14 @@ slope_deaths, intercept, r_value, p_value, std_err = stats.linregress(x_deaths,y
 y_hat_deaths = slope_deaths * x_deaths + intercept
 
 doubling_days = days_to_double(slope_deaths)
+y_double_2_days = slope_2_days * x_deaths + y_deaths[0]
+y_double_3_days = slope_3_days * x_deaths + y_deaths[0]
 
 plt.figure(figsize=(10, 8))
 plt.scatter(x_deaths, y_deaths, c='r', label='data')
 plt.plot(x_deaths, y_hat_deaths, c='r', label=f'regression r={r_value:0.3f}, slope={slope_deaths:0.3f}, days to double={doubling_days:0.1f}')
+plt.plot(x_deaths, y_double_2_days, c='k', linestyle='--', label="double in 2 days")
+plt.plot(x_deaths, y_double_3_days, c='k', linestyle='-.', label="double in 3 days")
 plt.xlabel(f"days since {deaths_dates_start}")
 plt.ylabel("log10(deaths)")
 plt.legend()
@@ -272,6 +283,8 @@ plt.show()
 plt.figure(figsize=(10, 6.5))
 plt.scatter(deaths_dates_subset, 10**y_deaths, c='r', label='data')
 plt.plot(deaths_dates_subset, 10**y_hat_deaths, c='r', label=f'regression r={r_value:0.3f}, days to double={doubling_days:0.1f}')
+plt.plot(deaths_dates_subset, 10**y_double_2_days, c='k', linestyle='--', label="double in 2 days")
+plt.plot(deaths_dates_subset, 10**y_double_3_days, c='k', linestyle='-.', label="double in 3 days")
 plt.xlim(deaths_dates_start_dt, deaths_dates[-1])
 plt.xlabel(f"days since {deaths_dates_start}")
 plt.xticks(rotation=rotation_angle)
