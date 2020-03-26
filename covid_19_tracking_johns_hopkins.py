@@ -63,10 +63,12 @@ def double_in_days_exponent(days_to_double: int) -> float:
 
 confirmed_url = "https://raw.github.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_global.csv"
 deaths_url = "https://raw.github.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_deaths_global.csv"
+recovered_url = "https://raw.github.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_recovered_global.csv"
 
 #%% fetch data
 df_confirmed = dataframe_from_csv_url(confirmed_url)
 df_deaths = dataframe_from_csv_url(deaths_url)
+df_recovered = dataframe_from_csv_url(recovered_url)
 
 #%% parse data
 ### confirmed cases
@@ -79,20 +81,23 @@ confirmed_totals = df_confirmed.iloc[:, DATE_COLUMN_START_INDEX:].sum()
 
 confirmed_grouped_by_country = df_confirmed.groupby("Country/Region")
 groups = dict(list(confirmed_grouped_by_country))
-confirmed_totals_china = groups['China'].iloc[:, DATE_COLUMN_START_INDEX:].sum()
-confirmed_totals_other = confirmed_totals - confirmed_totals_china
 df_confirmed_italy = df_confirmed[df_confirmed[COUNTRY_STR] == 'Italy']
 df_confirmed_france = df_confirmed[df_confirmed[COUNTRY_STR] == 'France']
 df_confirmed_us = df_confirmed[df_confirmed[COUNTRY_STR] == 'US']
-df_confirmed_ny = df_confirmed[df_confirmed[STATE_STR].str.contains("NY|New York", na=False)]
-df_confirmed_ma = df_confirmed[df_confirmed[STATE_STR].str.contains("MA|Massachusetts", na=False)]
-df_confirmed_nj = df_confirmed[df_confirmed[STATE_STR].str.contains("NJ|New Jersey", na=False)]
+
+confirmed_totals_china = groups['China'].iloc[:, DATE_COLUMN_START_INDEX:].sum()
+confirmed_totals_other = confirmed_totals - confirmed_totals_china
 confirmed_totals_italy = df_confirmed_italy.iloc[:, DATE_COLUMN_START_INDEX:].sum()
 confirmed_totals_france = df_confirmed_france.iloc[:, DATE_COLUMN_START_INDEX:].sum()
 confirmed_totals_us = df_confirmed_us.iloc[:, DATE_COLUMN_START_INDEX:].sum()
-confirmed_totals_ma = df_confirmed_ma.iloc[:, DATE_COLUMN_START_INDEX:].sum()
-confirmed_totals_ny = df_confirmed_ny.iloc[:, DATE_COLUMN_START_INDEX:].sum()
-confirmed_totals_nj = df_confirmed_nj.iloc[:, DATE_COLUMN_START_INDEX:].sum()
+
+# 2020.03.26 state level data eliminated from Johns Hopkins dataset
+# df_confirmed_ny = df_confirmed[df_confirmed[STATE_STR].str.contains("NY|New York", na=False)]
+# df_confirmed_ma = df_confirmed[df_confirmed[STATE_STR].str.contains("MA|Massachusetts", na=False)]
+# df_confirmed_nj = df_confirmed[df_confirmed[STATE_STR].str.contains("NJ|New Jersey", na=False)]
+# confirmed_totals_ma = df_confirmed_ma.iloc[:, DATE_COLUMN_START_INDEX:].sum()
+# confirmed_totals_ny = df_confirmed_ny.iloc[:, DATE_COLUMN_START_INDEX:].sum()
+# confirmed_totals_nj = df_confirmed_nj.iloc[:, DATE_COLUMN_START_INDEX:].sum()
 # ma_counties = df_confirmed_ma[STATE_STR].astype('str')
 # grouped_by_ma_county = df_confirmed_ma.groupby(STATE_STR)
 # groups_ma = dict(list(grouped_by_ma_county))
@@ -100,7 +105,6 @@ confirmed_totals_nj = df_confirmed_nj.iloc[:, DATE_COLUMN_START_INDEX:].sum()
 ### deaths
 df_deaths[[STATE_STR, COUNTRY_STR]] = df_deaths[[STATE_STR, COUNTRY_STR]].astype('str')
 df_deaths_us = df_deaths[df_deaths[COUNTRY_STR] == 'US']
-
 
 dates = df_deaths.columns[DATE_COLUMN_START_INDEX:]
 deaths_dates = [datetime.strptime(s, "%m/%d/%y") for s in dates]
@@ -113,15 +117,17 @@ deaths_totals_other = deaths_totals - deaths_totals_china
 deaths_totals_italy = death_groups_countries['Italy'].iloc[:, DATE_COLUMN_START_INDEX:].sum()
 deaths_totals_france = death_groups_countries['France'].iloc[:, DATE_COLUMN_START_INDEX:].sum()
 deaths_totals_us = death_groups_countries['US'].iloc[:, DATE_COLUMN_START_INDEX:].sum()
-df_deaths_ny = df_deaths[df_deaths[STATE_STR].str.contains("NY|New York", na=False)]
-df_deaths_ma = df_deaths[df_deaths[STATE_STR].str.contains("MA|Massachusetts", na=False)]
-df_deaths_nj = df_deaths[df_deaths[STATE_STR].str.contains("NJ|New Jersey", na=False)]
-deaths_totals_ma = df_deaths_ma.iloc[:, DATE_COLUMN_START_INDEX:].sum()
-deaths_totals_ny = df_deaths_ny.iloc[:, DATE_COLUMN_START_INDEX:].sum()
-deaths_totals_nj = df_deaths_nj.iloc[:, DATE_COLUMN_START_INDEX:].sum()
 
-deaths_grouped_by_state = df_deaths.groupby(STATE_STR)
-death_groups_states = dict(list(deaths_grouped_by_state))
+# 2020.03.26 state level data eliminated from Johns Hopkins dataset
+# df_deaths_ny = df_deaths[df_deaths[STATE_STR].str.contains("NY|New York", na=False)]
+# df_deaths_ma = df_deaths[df_deaths[STATE_STR].str.contains("MA|Massachusetts", na=False)]
+# df_deaths_nj = df_deaths[df_deaths[STATE_STR].str.contains("NJ|New Jersey", na=False)]
+# deaths_totals_ma = df_deaths_ma.iloc[:, DATE_COLUMN_START_INDEX:].sum()
+# deaths_totals_ny = df_deaths_ny.iloc[:, DATE_COLUMN_START_INDEX:].sum()
+# deaths_totals_nj = df_deaths_nj.iloc[:, DATE_COLUMN_START_INDEX:].sum()
+
+# deaths_grouped_by_state = df_deaths.groupby(STATE_STR)
+# death_groups_states = dict(list(deaths_grouped_by_state))
 
 #%% Plots!
 ### confirmed cases
@@ -178,50 +184,50 @@ plt.ylabel("numbers")
 plt.title("Covid-19 confirmed cases and deaths in US")
 plt.show()
 
-
 ### MA, NY, NJ
-confirmed_dates_start = "3/1/20"
-confirmed_dates_start_dt = datetime.strptime(confirmed_dates_start, "%m/%d/%y")
-confirmed_dates_start_index = confirmed_dates.index(confirmed_dates_start_dt)
+# 2020.03.26 state level data eliminated from Johns Hopkins dataset
+# confirmed_dates_start = "3/1/20"
+# confirmed_dates_start_dt = datetime.strptime(confirmed_dates_start, "%m/%d/%y")
+# confirmed_dates_start_index = confirmed_dates.index(confirmed_dates_start_dt)
 
-plt.figure(figsize=figure_size)
-plt.plot(confirmed_dates, confirmed_totals_ma, c='b', marker='o', label="MA confirmed cases")    
-plt.plot(deaths_dates, deaths_totals_ma, c='c', marker='o', label="MA deaths")    
-plt.plot(confirmed_dates, confirmed_totals_ny, c='firebrick', marker='o', label="NY confirmed cases")    
-plt.plot(deaths_dates, deaths_totals_ny, c='r', marker='o', label="NY deaths")    
-plt.plot(confirmed_dates, confirmed_totals_nj, c='darkgreen', marker='o', label="NJ confirmed cases")    
-plt.plot(deaths_dates, deaths_totals_nj, c='limegreen', marker='o', label="NJ deaths")
-plt.xlim(confirmed_dates[confirmed_dates_start_index], confirmed_dates[-1])
-plt.ylim(1e0, 2 * confirmed_totals_ny.max())
-plt.yscale('log')
-plt.xticks(rotation=rotation_angle)
-plt.grid(b=True, which='both', axis='both')
-plt.legend()
-plt.xlabel("date")
-plt.ylabel("numbers")
-plt.title("Covid-19 confirmed cases and deaths in MA, NY, and NJ")
-plt.show()
+# plt.figure(figsize=figure_size)
+# plt.plot(confirmed_dates, confirmed_totals_ma, c='b', marker='o', label="MA confirmed cases")    
+# plt.plot(deaths_dates, deaths_totals_ma, c='c', marker='o', label="MA deaths")    
+# plt.plot(confirmed_dates, confirmed_totals_ny, c='firebrick', marker='o', label="NY confirmed cases")    
+# plt.plot(deaths_dates, deaths_totals_ny, c='r', marker='o', label="NY deaths")    
+# plt.plot(confirmed_dates, confirmed_totals_nj, c='darkgreen', marker='o', label="NJ confirmed cases")    
+# plt.plot(deaths_dates, deaths_totals_nj, c='limegreen', marker='o', label="NJ deaths")
+# plt.xlim(confirmed_dates[confirmed_dates_start_index], confirmed_dates[-1])
+# plt.ylim(1e0, 2 * confirmed_totals_ny.max())
+# plt.yscale('log')
+# plt.xticks(rotation=rotation_angle)
+# plt.grid(b=True, which='both', axis='both')
+# plt.legend()
+# plt.xlabel("date")
+# plt.ylabel("numbers")
+# plt.title("Covid-19 confirmed cases and deaths in MA, NY, and NJ")
+# plt.show()
 
-#%% linear regression
-
-### confirmed start date
+#%% linear regression: confirmed cases
 confirmed_dates_start = "3/1/20"
 confirmed_dates_start_dt = datetime.strptime(confirmed_dates_start, "%m/%d/%y")
 
 confirmed_dates_start_index = confirmed_dates.index(confirmed_dates_start_dt)
 confirmed_dates_subset = confirmed_dates[confirmed_dates_start_index:]
 confirmed_dates_subset_count = len(confirmed_dates_subset)
-x = np.arange(confirmed_dates_subset_count)
-y = np.log10(confirmed_totals_us[confirmed_dates_start_index:])
-slope, intercept, r_value, p_value, std_err = stats.linregress(x,y)
-y_hat = slope * x + intercept
+x_confirmed = np.arange(confirmed_dates_subset_count)
+y_confirmed = np.log10(confirmed_totals_us[confirmed_dates_start_index:])
+slope_confirmed, intercept, r_value, p_value, std_err = stats.linregress(x_confirmed,y_confirmed)
+y_hat_confirmed = slope_confirmed * x_confirmed + intercept
 
-doubling_days = days_to_double(slope)
+doubling_days = days_to_double(slope_confirmed)
+slope_2_days = double_in_days_exponent(2)
+slope_3_days = double_in_days_exponent(3)
 
 #TODO: add lines for days to double
 plt.figure(figsize=(10, 8))
-plt.scatter(x, y, label='data')
-plt.plot(x, y_hat, c='b', label=f'regression r={r_value:0.3f}, slope={slope:0.3f}, days to double={doubling_days:0.1f}')
+plt.scatter(x_confirmed, y_confirmed, label='data')
+plt.plot(x_confirmed, y_hat_confirmed, c='b', label=f'regression r={r_value:0.3f}, slope={slope_confirmed:0.3f}, days to double={doubling_days:0.1f}')
 plt.xlabel(f"days since {confirmed_dates_start}")
 plt.ylabel("log10(confirmed cases)")
 plt.legend()
@@ -229,8 +235,8 @@ plt.title(f"linear regression of log10(confirmed US cases) since {confirmed_date
 plt.show()
 
 plt.figure(figsize=(10, 6.5))
-plt.scatter(confirmed_dates_subset, 10**y, label='data')
-plt.plot(confirmed_dates_subset, 10**y_hat, c='b', label=f'regression r={r_value:0.3f}, days to double={doubling_days:0.1f}')
+plt.scatter(confirmed_dates_subset, 10**y_confirmed, label='data')
+plt.plot(confirmed_dates_subset, 10**y_hat_confirmed, c='b', label=f'regression r={r_value:0.3f}, days to double={doubling_days:0.1f}')
 plt.xlim(confirmed_dates_start_dt, confirmed_dates[-1])
 plt.xlabel(f"days since {confirmed_dates_start}")
 plt.xticks(rotation=rotation_angle)
@@ -239,40 +245,47 @@ plt.legend()
 plt.title(f"regression of confirmed US cases since {confirmed_dates_start}")
 plt.show()
 
-### deaths start date
-#TODO: regression on death rates
-# deaths_dates_start = "3/3/20"
-# deaths_dates_start_dt = datetime.strptime(deaths_dates_start, "%m/%d/%y")
+#%% linear regression: deaths
+# deaths_dates_start = "3/1/20"
+deaths_dates_start = "3/15/20"
+deaths_dates_start_dt = datetime.strptime(deaths_dates_start, "%m/%d/%y")
 
-# deaths_dates_start_index = deaths_dates.index(deaths_dates_start_dt)
-# deaths_dates_subset = deaths_dates[deaths_dates_start_index:]
-# deaths_dates_subset_count = len(deaths_dates_subset)
-# x = np.arange(deaths_dates_subset_count)
-# y = np.log10(deaths_totals_us[deaths_dates_start_index:])
-# slope, intercept, r_value, p_value, std_err = stats.linregress(x,y)
-# y_hat = slope * x + intercept
+deaths_dates_start_index = deaths_dates.index(deaths_dates_start_dt)
+deaths_dates_subset = deaths_dates[deaths_dates_start_index:]
+deaths_dates_subset_count = len(deaths_dates_subset)
+x_deaths = np.arange(deaths_dates_subset_count)
+y_deaths = np.log10(deaths_totals_us[deaths_dates_start_index:])
+slope_deaths, intercept, r_value, p_value, std_err = stats.linregress(x_deaths,y_deaths)
+y_hat_deaths = slope_deaths * x_deaths + intercept
 
-# plt.figure(figsize=(10, 8))
-# plt.scatter(x, y, c='r', label='data')
-# plt.plot(x, y_hat, c='r', label=f'regression r={r_value:0.3f}, slope={slope:0.3f}')
-# plt.xlabel(f"days since {deaths_dates_start}")
-# plt.ylabel("log10(deaths)")
-# plt.legend()
-# plt.title(f"linear regression of log10(US deaths) since {deaths_dates_start}")
-# plt.show()
+doubling_days = days_to_double(slope_deaths)
 
-# plt.figure(figsize=(10, 6.5))
-# plt.scatter(deaths_dates_subset, 10**y, c='r', label='data')
-# plt.plot(deaths_dates_subset, 10**y_hat, c='r', label=f'regression r={r_value:0.3f}')
-# plt.xlim(deaths_dates_start_dt, deaths_dates[-1])
-# plt.xlabel(f"days since {deaths_dates_start}")
-# plt.xticks(rotation=rotation_angle)
-# plt.ylabel("deaths")
-# plt.legend()
-# plt.title(f"regression of US deaths since {deaths_dates_start}")
-# plt.show()
+plt.figure(figsize=(10, 8))
+plt.scatter(x_deaths, y_deaths, c='r', label='data')
+plt.plot(x_deaths, y_hat_deaths, c='r', label=f'regression r={r_value:0.3f}, slope={slope_deaths:0.3f}, days to double={doubling_days:0.1f}')
+plt.xlabel(f"days since {deaths_dates_start}")
+plt.ylabel("log10(deaths)")
+plt.legend()
+plt.title(f"linear regression of log10(US deaths) since {deaths_dates_start}")
+plt.show()
 
-#%% pymc3 MCMC model for regression
+plt.figure(figsize=(10, 6.5))
+plt.scatter(deaths_dates_subset, 10**y_deaths, c='r', label='data')
+plt.plot(deaths_dates_subset, 10**y_hat_deaths, c='r', label=f'regression r={r_value:0.3f}, days to double={doubling_days:0.1f}')
+plt.xlim(deaths_dates_start_dt, deaths_dates[-1])
+plt.xlabel(f"days since {deaths_dates_start}")
+plt.xticks(rotation=rotation_angle)
+plt.ylabel("deaths")
+plt.legend()
+plt.title(f"regression of US deaths since {deaths_dates_start}")
+plt.show()
+
+#%% pymc3 MCMC model for regression for confirmed cases
+x = x_confirmed
+y = y_confirmed
+y_hat = y_hat_confirmed
+slope = slope_confirmed
+
 basic_model = pm.Model()
 
 ### model specification
