@@ -77,9 +77,17 @@ ny_daily_df = ny_daily_gb.sort_values(by=['date'], ignore_index=True)
 nj_daily_gb = states_gb.get_group('NJ')
 nj_daily_df = nj_daily_gb.sort_values(by=['date'], ignore_index=True)
 
+tx_daily_gb = states_gb.get_group('TX')
+tx_daily_df = tx_daily_gb.sort_values(by=['date'], ignore_index=True)
+
+ca_daily_gb = states_gb.get_group('CA')
+ca_daily_df = ca_daily_gb.sort_values(by=['date'], ignore_index=True)
+
 
 #%% plots!
 plot_daily_data(us_daily_df, title_str='All US')
 plot_daily_data(ma_daily_df, title_str='MA')
 plot_daily_data(ny_daily_df, title_str='NY')
 plot_daily_data(nj_daily_df, title_str='NJ')
+plot_daily_data(ca_daily_df, title_str='CA')
+plot_daily_data(tx_daily_df, title_str='TX')
