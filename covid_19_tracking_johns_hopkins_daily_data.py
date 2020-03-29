@@ -31,6 +31,7 @@ import pymc3 as pm
 
 ### project imports
 from dataframe_from_csv_url import dataframe_from_csv_url
+import days_to_double
 
 ### some constants
 DATE_COLUMN_START_INDEX = 4
@@ -41,24 +42,6 @@ rotation_angle = 0
 COUNTRY_STR = 'Country/Region'
 STATE_STR = 'Province/State'
 ADMIN2 = 'Admin2'
-
-#%% functions
-def days_to_double(exponent: float) -> float:
-    return log(2) / log(10**exponent)
-
-
-def double_in_days_exponent(days_to_double: int) -> float:
-    exponent = log10(2) / days_to_double
-    
-    return exponent
-
-# tests
-# d2d = 1.0
-# exponent = double_in_days_exponent(d2d)
-# print(f'days to double = {d2d} => exponent = {exponent}')
-
-# d2d = days_to_double(exponent)
-# print(f'exponent={exp_test} => days to double = {d2d}')
 
 #%% data sources
 

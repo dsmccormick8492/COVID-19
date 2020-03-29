@@ -22,12 +22,12 @@ import pandas as pd
 import matplotlib.pyplot as plt
 #import seaborn as sns
 
-import urllib.request
-from io import StringIO
 from datetime import datetime
 
 ### project imports
 from dataframe_from_csv_url import dataframe_from_csv_url
+import linear_regression as lr
+import doubling
 
 ### constants
 ENCODING_TYPE = 'utf-8'
@@ -54,7 +54,9 @@ us_daily_csv = "https://covidtracking.com/api/us/daily.csv"
 states_daily_csv = "https://covidtracking.com/api/states/daily.csv"
 
 us_daily_df = dataframe_from_csv_url(us_daily_csv)
-states_df = dataframe_from_csv_url(states_daily_csv)
+us_daily_df.sort_values(by='date', inplace=True)
+states_daily_df = dataframe_from_csv_url(states_daily_csv)
+us_daily_df.sort_values(by='date', inplace=True)
 
 #%% US
 datetime_strings = [s for s in us_daily_df['date']]
@@ -62,32 +64,64 @@ datetimes = [datetime.strptime(str(s), "%Y%m%d") for s in datetime_strings]
 us_daily_df['datetime'] = datetimes
 
 #%% states
-datetime_strings = [s for s in states_df['date']]
+state_codes = ['MA', 'NY', 'NJ', 'CA', 'TX', 'LA']
+state_names = {
+    'MA' : 'Massachusetts',
+    'NY' : 'New York',
+    'NJ' : 'New Jersey',
+    'CA' : 'California',
+    'TX' : 'Texas',
+    'LA' : 'Louisiana',
+    }
+
+datetime_strings = [s for s in states_daily_df['date']]
 datetimes = [datetime.strptime(str(s), "%Y%m%d") for s in datetime_strings]
-states_df['datetime'] = datetimes
+states_daily_df['datetime'] = datetimes
 
-states_gb = states_df.groupby(by='state')
+state_dfs = {}
 
-ma_daily_gb = states_gb.get_group('MA')
-ma_daily_df = ma_daily_gb.sort_values(by=['date'], ignore_index=True)
+states_gb = states_daily_df.groupby(by='state')
 
-ny_daily_gb = states_gb.get_group('NY')
-ny_daily_df = ny_daily_gb.sort_values(by=['date'], ignore_index=True)
+for state_code in state_codes:
+    daily_gb = states_gb.get_group(state_code)
+    daily_df = daily_gb.sort_values(by=['date'], ignore_index=True)
+    state_dfs[state_code] = daily_df
 
-nj_daily_gb = states_gb.get_group('NJ')
-nj_daily_df = nj_daily_gb.sort_values(by=['date'], ignore_index=True)
-
-tx_daily_gb = states_gb.get_group('TX')
-tx_daily_df = tx_daily_gb.sort_values(by=['date'], ignore_index=True)
-
-ca_daily_gb = states_gb.get_group('CA')
-ca_daily_df = ca_daily_gb.sort_values(by=['date'], ignore_index=True)
-
+entity_codes = ['US']
+entity_codes.extend(state_codes)
+entity_dfs = {}
+entity_dfs['US'] = us_daily_df
+entity_dfs.update(state_dfs)
 
 #%% plots!
 plot_daily_data(us_daily_df, title_str='All US')
-plot_daily_data(ma_daily_df, title_str='MA')
-plot_daily_data(ny_daily_df, title_str='NY')
-plot_daily_data(nj_daily_df, title_str='NJ')
-plot_daily_data(ca_daily_df, title_str='CA')
-plot_daily_data(tx_daily_df, title_str='TX')
+for state_code, state_df in state_dfs.items():
+    plot_daily_data(state_df, title_str=state_names[state_code])
+
+
+#%% some regression tests
+df = us_daily_df[['datetime', 'positive']].copy().dropna()
+df = df[df['positive'] > 0].reset_index(drop=True)
+slope, intercept, r_value, std_err, y_hat = lr.linear_regression(df.index, np.log10(df['positive']))
+days2double = doubling.days_to_double(slope)
+print(f"Days for positive cases in US to double => {days2double:0.2f}")
+
+df = state_df[['datetime', 'death']].copy().dropna().reset_index(drop=True)
+slope, intercept, r_value, std_err, y_hat = lr.linear_regression(df.index, np.log10(df['death']))
+days2double = doubling.days_to_double(slope)
+print(f"Days for deaths in US to double => {days2double:0.2f}")
+print()
+
+
+for state_code, state_df in state_dfs.items():
+    df = state_df[['datetime', 'positive']].copy().dropna()
+    df = df[df['positive'] > 0].reset_index(drop=True)
+    slope, intercept, r_value, std_err, y_hat = lr.linear_regression(df.index, np.log10(df['positive']))
+    days2double = doubling.days_to_double(slope)
+    print(f"Days for positive cases in {state_names[state_code]} to double => {days2double:0.2f}")
+
+    df = state_df[['datetime', 'death']].copy().dropna().reset_index(drop=True)
+    slope, intercept, r_value, std_err, y_hat = lr.linear_regression(df.index, np.log10(df['death']))
+    days2double = doubling.days_to_double(slope)
+    print(f"Days for deaths in {state_names[state_code]} to double => {days2double:0.2f}")
+    print()

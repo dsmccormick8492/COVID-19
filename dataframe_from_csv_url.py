@@ -30,6 +30,6 @@ def dataframe_from_csv_url(url_str: str) -> pd.DataFrame:
     
     string = str(csv_bytes, ENCODING_TYPE)
     data = StringIO(string)
-    df = pd.read_csv(data)    
+    df = pd.read_csv(data)
     
     return df

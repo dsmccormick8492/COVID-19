@@ -132,12 +132,12 @@ deaths_totals_us = death_groups_countries['US'].iloc[:, DATE_COLUMN_START_INDEX:
 #%% Plots!
 ### confirmed cases
 plt.figure(figsize=figure_size)
-plt.scatter(confirmed_dates, confirmed_totals, label='Total')
-plt.scatter(confirmed_dates, confirmed_totals_china, c='m', label='Mainland China')
-plt.scatter(confirmed_dates, confirmed_totals_other, c='k', label='all rest of the world')
-plt.scatter(confirmed_dates, confirmed_totals_italy, c='g', label='Italy only')
-plt.scatter(confirmed_dates, confirmed_totals_france, c='r', label='France only')
-plt.scatter(confirmed_dates, confirmed_totals_us, c='b', label='US only')
+plt.plot(confirmed_dates, confirmed_totals, label='Total')
+plt.plot(confirmed_dates, confirmed_totals_china, c='m', label='Mainland China')
+plt.plot(confirmed_dates, confirmed_totals_other, c='k', label='all rest of the world')
+plt.plot(confirmed_dates, confirmed_totals_italy, c='g', label='Italy only')
+plt.plot(confirmed_dates, confirmed_totals_france, c='r', label='France only')
+plt.plot(confirmed_dates, confirmed_totals_us, c='b', label='US only')
 # plt.ylim(0, totals.max())
 plt.xticks(rotation=rotation_angle)
 plt.yscale('log')
@@ -152,12 +152,12 @@ plt.show()
 
 ### deaths
 plt.figure(figsize=figure_size)
-plt.scatter(deaths_dates, deaths_totals, label='Total')
-plt.scatter(deaths_dates, deaths_totals_china, c='m', label='Mainland China')
-plt.scatter(deaths_dates, deaths_totals_other, c='k', label='all rest of the world')
-plt.scatter(deaths_dates, deaths_totals_italy, c='g', label='Italy only')
-plt.scatter(deaths_dates, deaths_totals_france, c='r', label='France only')
-plt.scatter(deaths_dates, deaths_totals_us, c='b', label='US only')
+plt.plot(deaths_dates, deaths_totals, label='Total')
+plt.plot(deaths_dates, deaths_totals_china, c='m', label='Mainland China')
+plt.plot(deaths_dates, deaths_totals_other, c='k', label='all rest of the world')
+plt.plot(deaths_dates, deaths_totals_italy, c='g', label='Italy only')
+plt.plot(deaths_dates, deaths_totals_france, c='r', label='France only')
+plt.plot(deaths_dates, deaths_totals_us, c='b', label='US only')
 # plt.ylim(0, totals.max())
 plt.xticks(rotation=rotation_angle)
 plt.yscale('log')
@@ -227,7 +227,6 @@ slope_3_days = double_in_days_exponent(3)
 y_double_2_days = slope_2_days * x_confirmed + y_confirmed[0]
 y_double_3_days = slope_3_days * x_confirmed + y_confirmed[0]
 
-#TODO: add lines for days to double
 plt.figure(figsize=(10, 8))
 plt.scatter(x_confirmed, y_confirmed, label='data')
 plt.plot(x_confirmed, y_hat_confirmed, c='b', label=f'regresson r={r_value:0.3f}, slope={slope_confirmed:0.3f}, days to double={doubling_days:0.1f}')
