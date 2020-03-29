@@ -91,41 +91,66 @@ for state_code in state_codes:
     daily_df = daily_gb.sort_values(by=['date'], ignore_index=True)
     state_dfs[state_code] = daily_df
 
+
+### Add US and states into single entity to simplify plotting and calcuations
 entity_codes = ['US']
 entity_codes.extend(state_codes)
+entity_names = ['United States']
+entity_names.extend(list(state_names_dict.values()))
 entity_dfs = {}
 entity_dfs['US'] = us_daily_df
 entity_dfs.update(state_dfs)
+entity_names_dict = dict(zip(entity_codes, entity_names))
+
 
 #%% plots!
-plot_daily_data(us_daily_df, title_str='All US')
-for state_code, state_df in state_dfs.items():
-    plot_daily_data(state_df, title_str=state_names_dict[state_code])
+# plot_daily_data(us_daily_df, title_str='All US')
+# for state_code, state_df in state_dfs.items():
+#     plot_daily_data(state_df, title_str=state_names_dict[state_code])
 
-
+for entity_code, entity_df in entity_dfs.items():
+    plot_daily_data(entity_df, title_str=entity_names_dict[entity_code])
 #%% some regression tests
-df = us_daily_df[['datetime', 'positive']].copy().dropna()
-df = df[df['positive'] > 0].reset_index(drop=True)
-slope, intercept, r_value, std_err, y_hat = lr.linear_regression(df.index, np.log10(df['positive']))
-days2double = doubling.days_to_double(slope)
-print(f"Days for positive cases in US to double => {days2double:0.2f}")
+# df = us_daily_df[['datetime', 'positive']].copy().dropna()
+# df = df[df['positive'] > 0].reset_index(drop=True)
+# slope, intercept, r_value, std_err, y_hat = lr.linear_regression(df.index, np.log10(df['positive']))
+# days2double = doubling.days_to_double(slope)
+# print(f"Days for positive cases in US to double => {days2double:0.2f}")
 
-df = state_df[['datetime', 'death']].copy().dropna().reset_index(drop=True)
-slope, intercept, r_value, std_err, y_hat = lr.linear_regression(df.index, np.log10(df['death']))
-days2double = doubling.days_to_double(slope)
-print(f"Days for deaths in US to double => {days2double:0.2f}")
-print()
+# df = state_df[['datetime', 'death']].copy().dropna().reset_index(drop=True)
+# slope, intercept, r_value, std_err, y_hat = lr.linear_regression(df.index, np.log10(df['death']))
+# days2double = doubling.days_to_double(slope)
+# print(f"Days for deaths in US to double => {days2double:0.2f}")
+# print()
 
 
-for state_code, state_df in state_dfs.items():
-    df = state_df[['datetime', 'positive']].copy().dropna()
+# for state_code, state_df in state_dfs.items():
+#     df = state_df[['datetime', 'positive']].copy().dropna()
+#     df = df[df['positive'] > 0].reset_index(drop=True)
+#     slope, intercept, r_value, std_err, y_hat = lr.linear_regression(df.index, np.log10(df['positive']))
+#     days2double = doubling.days_to_double(slope)
+#     print(f"Days for positive cases in {state_names_dict[state_code]} to double => {days2double:0.2f}")
+
+#     df = state_df[['datetime', 'death']].copy().dropna().reset_index(drop=True)
+#     slope, intercept, r_value, std_err, y_hat = lr.linear_regression(df.index, np.log10(df['death']))
+#     days2double = doubling.days_to_double(slope)
+#     print(f"Days for deaths in {state_names_dict[state_code]} to double => {days2double:0.2f}")
+#     print()
+
+
+
+
+for entity_code, entity_df in entity_dfs.items():
+    df = entity_df[['datetime', 'positive']].copy().dropna()
     df = df[df['positive'] > 0].reset_index(drop=True)
     slope, intercept, r_value, std_err, y_hat = lr.linear_regression(df.index, np.log10(df['positive']))
     days2double = doubling.days_to_double(slope)
-    print(f"Days for positive cases in {state_names_dict[state_code]} to double => {days2double:0.2f}")
+    print(f"Days for positive cases in {entity_names_dict[entity_code]} to double => {days2double:0.2f}")
 
-    df = state_df[['datetime', 'death']].copy().dropna().reset_index(drop=True)
+    df = entity_df[['datetime', 'death']].copy().dropna().reset_index(drop=True)
     slope, intercept, r_value, std_err, y_hat = lr.linear_regression(df.index, np.log10(df['death']))
     days2double = doubling.days_to_double(slope)
-    print(f"Days for deaths in {state_names_dict[state_code]} to double => {days2double:0.2f}")
+    print(f"Days for deaths in {entity_names_dict[entity_code]} to double => {days2double:0.2f}")
     print()
+
+

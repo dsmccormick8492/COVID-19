@@ -40,26 +40,6 @@ rotation_angle = 0
 COUNTRY_STR = 'Country/Region'
 STATE_STR = 'Province/State'
 
-#%% functions
-def days_to_double(exponent: float) -> float:
-    return log(2) / log(10**exponent)
-
-
-def double_in_days_exponent(days_to_double: int) -> float:
-    exponent = log10(2) / days_to_double
-    
-    return exponent
-
-# tests
-# d2d = 1.0
-# exponent = double_in_days_exponent(d2d)
-# print(f'days to double = {d2d} => exponent = {exponent}')
-
-# d2d = days_to_double(exponent)
-# print(f'exponent={exp_test} => days to double = {d2d}')
-
-
-
 #%% data sources
 confirmed_url = "https://raw.github.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_global.csv"
 deaths_url = "https://raw.github.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_deaths_global.csv"
@@ -91,17 +71,6 @@ confirmed_totals_italy = df_confirmed_italy.iloc[:, DATE_COLUMN_START_INDEX:].su
 confirmed_totals_france = df_confirmed_france.iloc[:, DATE_COLUMN_START_INDEX:].sum()
 confirmed_totals_us = df_confirmed_us.iloc[:, DATE_COLUMN_START_INDEX:].sum()
 
-# 2020.03.26 state level data eliminated from Johns Hopkins dataset
-# df_confirmed_ny = df_confirmed[df_confirmed[STATE_STR].str.contains("NY|New York", na=False)]
-# df_confirmed_ma = df_confirmed[df_confirmed[STATE_STR].str.contains("MA|Massachusetts", na=False)]
-# df_confirmed_nj = df_confirmed[df_confirmed[STATE_STR].str.contains("NJ|New Jersey", na=False)]
-# confirmed_totals_ma = df_confirmed_ma.iloc[:, DATE_COLUMN_START_INDEX:].sum()
-# confirmed_totals_ny = df_confirmed_ny.iloc[:, DATE_COLUMN_START_INDEX:].sum()
-# confirmed_totals_nj = df_confirmed_nj.iloc[:, DATE_COLUMN_START_INDEX:].sum()
-# ma_counties = df_confirmed_ma[STATE_STR].astype('str')
-# grouped_by_ma_county = df_confirmed_ma.groupby(STATE_STR)
-# groups_ma = dict(list(grouped_by_ma_county))
-
 ### deaths
 df_deaths[[STATE_STR, COUNTRY_STR]] = df_deaths[[STATE_STR, COUNTRY_STR]].astype('str')
 df_deaths_us = df_deaths[df_deaths[COUNTRY_STR] == 'US']
@@ -117,17 +86,6 @@ deaths_totals_other = deaths_totals - deaths_totals_china
 deaths_totals_italy = death_groups_countries['Italy'].iloc[:, DATE_COLUMN_START_INDEX:].sum()
 deaths_totals_france = death_groups_countries['France'].iloc[:, DATE_COLUMN_START_INDEX:].sum()
 deaths_totals_us = death_groups_countries['US'].iloc[:, DATE_COLUMN_START_INDEX:].sum()
-
-# 2020.03.26 state level data eliminated from Johns Hopkins dataset
-# df_deaths_ny = df_deaths[df_deaths[STATE_STR].str.contains("NY|New York", na=False)]
-# df_deaths_ma = df_deaths[df_deaths[STATE_STR].str.contains("MA|Massachusetts", na=False)]
-# df_deaths_nj = df_deaths[df_deaths[STATE_STR].str.contains("NJ|New Jersey", na=False)]
-# deaths_totals_ma = df_deaths_ma.iloc[:, DATE_COLUMN_START_INDEX:].sum()
-# deaths_totals_ny = df_deaths_ny.iloc[:, DATE_COLUMN_START_INDEX:].sum()
-# deaths_totals_nj = df_deaths_nj.iloc[:, DATE_COLUMN_START_INDEX:].sum()
-
-# deaths_grouped_by_state = df_deaths.groupby(STATE_STR)
-# death_groups_states = dict(list(deaths_grouped_by_state))
 
 #%% Plots!
 ### confirmed cases
@@ -183,30 +141,6 @@ plt.xlabel("date")
 plt.ylabel("numbers")
 plt.title("Covid-19 confirmed cases and deaths in US")
 plt.show()
-
-### MA, NY, NJ
-# 2020.03.26 state level data eliminated from Johns Hopkins dataset
-# confirmed_dates_start = "3/1/20"
-# confirmed_dates_start_dt = datetime.strptime(confirmed_dates_start, "%m/%d/%y")
-# confirmed_dates_start_index = confirmed_dates.index(confirmed_dates_start_dt)
-
-# plt.figure(figsize=figure_size)
-# plt.plot(confirmed_dates, confirmed_totals_ma, c='b', marker='o', label="MA confirmed cases")    
-# plt.plot(deaths_dates, deaths_totals_ma, c='c', marker='o', label="MA deaths")    
-# plt.plot(confirmed_dates, confirmed_totals_ny, c='firebrick', marker='o', label="NY confirmed cases")    
-# plt.plot(deaths_dates, deaths_totals_ny, c='r', marker='o', label="NY deaths")    
-# plt.plot(confirmed_dates, confirmed_totals_nj, c='darkgreen', marker='o', label="NJ confirmed cases")    
-# plt.plot(deaths_dates, deaths_totals_nj, c='limegreen', marker='o', label="NJ deaths")
-# plt.xlim(confirmed_dates[confirmed_dates_start_index], confirmed_dates[-1])
-# plt.ylim(1e0, 2 * confirmed_totals_ny.max())
-# plt.yscale('log')
-# plt.xticks(rotation=rotation_angle)
-# plt.grid(b=True, which='both', axis='both')
-# plt.legend()
-# plt.xlabel("date")
-# plt.ylabel("numbers")
-# plt.title("Covid-19 confirmed cases and deaths in MA, NY, and NJ")
-# plt.show()
 
 #%% linear regression: confirmed cases
 confirmed_dates_start = "3/1/20"
