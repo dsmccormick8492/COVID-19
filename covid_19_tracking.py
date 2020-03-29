@@ -64,15 +64,19 @@ datetimes = [datetime.strptime(str(s), "%Y%m%d") for s in datetime_strings]
 us_daily_df['datetime'] = datetimes
 
 #%% states
-state_codes = ['MA', 'NY', 'NJ', 'CA', 'TX', 'LA']
-state_names = {
+
+state_names_dict = {
     'MA' : 'Massachusetts',
     'NY' : 'New York',
     'NJ' : 'New Jersey',
     'CA' : 'California',
     'TX' : 'Texas',
     'LA' : 'Louisiana',
+    'NH' : 'New Hampshire',
+    'VT' : 'Vermont',
     }
+
+state_codes = [k for k in state_names_dict.keys()]
 
 datetime_strings = [s for s in states_daily_df['date']]
 datetimes = [datetime.strptime(str(s), "%Y%m%d") for s in datetime_strings]
@@ -96,7 +100,7 @@ entity_dfs.update(state_dfs)
 #%% plots!
 plot_daily_data(us_daily_df, title_str='All US')
 for state_code, state_df in state_dfs.items():
-    plot_daily_data(state_df, title_str=state_names[state_code])
+    plot_daily_data(state_df, title_str=state_names_dict[state_code])
 
 
 #%% some regression tests
@@ -118,10 +122,10 @@ for state_code, state_df in state_dfs.items():
     df = df[df['positive'] > 0].reset_index(drop=True)
     slope, intercept, r_value, std_err, y_hat = lr.linear_regression(df.index, np.log10(df['positive']))
     days2double = doubling.days_to_double(slope)
-    print(f"Days for positive cases in {state_names[state_code]} to double => {days2double:0.2f}")
+    print(f"Days for positive cases in {state_names_dict[state_code]} to double => {days2double:0.2f}")
 
     df = state_df[['datetime', 'death']].copy().dropna().reset_index(drop=True)
     slope, intercept, r_value, std_err, y_hat = lr.linear_regression(df.index, np.log10(df['death']))
     days2double = doubling.days_to_double(slope)
-    print(f"Days for deaths in {state_names[state_code]} to double => {days2double:0.2f}")
+    print(f"Days for deaths in {state_names_dict[state_code]} to double => {days2double:0.2f}")
     print()
