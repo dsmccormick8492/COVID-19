@@ -99,10 +99,10 @@ def mcmc_log_regression(x: np.array, y: np.array, y_hat: np.array, slope: float,
     # plt.scatter(x, y, c='r', label='data', zorder=10)
     # plt.xlim(0, x.max())
     # plt.legend()
-    # title_str = f"posterior predictive sampling of MCMC fit to log10(confirmed cases) since {confirmed_dates_start}"
+    # title_str = f"posterior predictive sampling of MCMC fit to log10(confirmed cases)"
     # plt.title(title_str)
     # plt.show()
-    
+        
     plt.figure(figsize=(10, 10))
     for i in range(sample_count):
         y_sample = samples['slope_mc'][i] * x + samples['intercept_mc'][i]
@@ -113,7 +113,7 @@ def mcmc_log_regression(x: np.array, y: np.array, y_hat: np.array, slope: float,
     plt.yscale('log')
     plt.grid(which='both')
     plt.legend()
-    title_str = f"{sample_count} posterior predictive samples of MCMC fit to log10({data_type}) since {confirmed_dates_start}"
+    title_str = f"{sample_count} posterior predictive samples of MCMC fit to log10({data_type})"
     plt.title(title_str)
     plt.show()
     
@@ -126,6 +126,6 @@ def mcmc_log_regression(x: np.array, y: np.array, y_hat: np.array, slope: float,
     plt.xlim(0, x.max())
     plt.grid(which='both')
     plt.legend()
-    title_str = f"{sample_count} posterior predictive samples of MCMC fit to log10({data_type}) cases) since {confirmed_dates_start}"
+    title_str = f"{sample_count} posterior predictive samples of MCMC fit to log10({data_type}) cases)"
     plt.title(title_str)
     plt.show()
