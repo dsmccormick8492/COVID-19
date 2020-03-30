@@ -30,6 +30,8 @@ import scipy.stats as stats
 
 ### project imports
 from dataframe_from_csv_url import dataframe_from_csv_url
+import doubling
+import mcmc_regression
 
 ### some constants
 DATE_COLUMN_START_INDEX = 4
@@ -154,9 +156,9 @@ y_confirmed = np.log10(confirmed_totals_us[confirmed_dates_start_index:])
 slope_confirmed, intercept, r_value, p_value, std_err = stats.linregress(x_confirmed,y_confirmed)
 y_hat_confirmed = slope_confirmed * x_confirmed + intercept
 
-doubling_days = days_to_double(slope_confirmed)
-slope_2_days = double_in_days_exponent(2)
-slope_3_days = double_in_days_exponent(3)
+doubling_days = doubling.days_to_double(slope_confirmed)
+slope_2_days = doubling.double_in_days_exponent(2)
+slope_3_days = doubling.double_in_days_exponent(3)
 
 y_double_2_days = slope_2_days * x_confirmed + y_confirmed[0]
 y_double_3_days = slope_3_days * x_confirmed + y_confirmed[0]
@@ -198,7 +200,7 @@ y_deaths = np.log10(deaths_totals_us[deaths_dates_start_index:])
 slope_deaths, intercept, r_value, p_value, std_err = stats.linregress(x_deaths,y_deaths)
 y_hat_deaths = slope_deaths * x_deaths + intercept
 
-doubling_days = days_to_double(slope_deaths)
+doubling_days = doubling.days_to_double(slope_deaths)
 y_double_2_days = slope_2_days * x_deaths + y_deaths[0]
 y_double_3_days = slope_3_days * x_deaths + y_deaths[0]
 
@@ -227,5 +229,5 @@ plt.title(f"regression of US deaths since {deaths_dates_start}")
 plt.show()
 
 #%% pymc3 MCMC model for regression for confirmed cases
-# mcmc_log_regression(x_confirmed, y_confirmed, y_hat_confirmed, slope_confirmed, "US confirmed cases")
+mcmc_regression.mcmc_log_regression(x_confirmed, y_confirmed, y_hat_confirmed, slope_confirmed, "US confirmed cases")
 
