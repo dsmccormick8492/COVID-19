@@ -228,8 +228,8 @@ plt.legend()
 plt.title(f"regression of US deaths since {deaths_dates_start}")
 plt.show()
 
-#%% pymc3 MCMC model for regression for confirmed cases
-mcmc_regression.mcmc_log_regression(x_confirmed, y_confirmed, y_hat_confirmed, slope_confirmed, "US confirmed cases")
-
 #%% pymc3 MCMC model for regression for deaths
 mcmc_regression.mcmc_log_regression(x_deaths, y_deaths, y_hat_deaths, slope_deaths, "US deaths")
+
+#%% pymc3 MCMC model for regression for confirmed cases
+mcmc_regression.mcmc_log_regression(x_confirmed, y_confirmed, y_hat_confirmed, slope_confirmed, "US confirmed cases")
