@@ -22,6 +22,9 @@ import pandas as pd
 import matplotlib.pyplot as plt
 #import seaborn as sns
 
+# import statsmodels.api as sm
+from statsmodels.nonparametric.smoothers_lowess import lowess
+
 from datetime import datetime
 
 ### project imports
@@ -34,14 +37,61 @@ ENCODING_TYPE = 'utf-8'
 FIGURE_SIZE = (10, 10)
 
 #%% functions
-def plot_daily_data(df: pd.DataFrame, title_str: str) -> None:
+def compute_lowess(x: np.array, y: np.array, is_logrithmic=True) -> np.array:
+    """
+    Compute a LOWESS (Locally Weighted Scatterplot Smoothing) estimate of 
+    data. 
+    
+    see: https://www.statsmodels.org/dev/generated/statsmodels.nonparametric.smoothers_lowess.lowess.html
+
+    Parameters
+    ----------
+    x : np.array
+        x data.
+    y : np.array
+        y data.
+    is_logrithmic : TYPE, optional
+        whether the y-data are logrithmically distributed. 
+        If so, does the LOWESS estimate on log10(y) data. 
+        The default is True.
+
+    Returns
+    -------
+    y_lowess : TYPE
+        LOWESS smoothed estimate of the input y data.
+
+    """
+    if is_logrithmic:
+        y = np.log10(y)
+        
+    z_lowess = lowess(y, x, frac=1./3.)
+    # z_lowess = lowess(y, x)
+
+    y_lowess = z_lowess[:, 1]
+
+    if is_logrithmic:
+        y_lowess = 10**y_lowess
+        
+    return y_lowess
+
+
+def plot_daily_data(df: pd.DataFrame, title_str: str, plot_lowess=False) -> None:
     plt.figure(figsize=FIGURE_SIZE)
     dates = df['date']
     dates = df['datetime']
-    plt.plot(dates, df['total'], label='total')
-    plt.plot(dates, df['positive'], label='positive')
-    plt.plot(dates, df['negative'], label='negative')
-    plt.plot(dates, df['death'], label='deaths')
+    plt.plot(dates, df['total'], 'o', label='total', zorder=10) # plot on top
+    plt.plot(dates, df['positive'], 'o', label='positive')
+    plt.plot(dates, df['negative'], 'o', label='negative')
+    plt.plot(dates, df['death'], 'or', label='deaths')
+    
+    if plot_lowess == True:
+        positives_lowess = compute_lowess(dates, df['positive'], is_logrithmic=True)
+        plt.plot(dates, positives_lowess, c='gray')
+        totals_lowess = compute_lowess(dates, df['total'], is_logrithmic=True)
+        plt.plot(dates, totals_lowess, c='gray')
+        deaths_lowess = compute_lowess(dates, df['death'], is_logrithmic=True)
+        plt.plot(dates, deaths_lowess, c='gray')
+
     plt.yscale('log')
     plt.grid(which='both', axis='both')
     plt.legend()
@@ -106,7 +156,7 @@ entity_names_dict = dict(zip(entity_codes, entity_names))
 
 #%% plots!
 for entity_code, entity_df in entity_df_dict.items():
-    plot_daily_data(entity_df, title_str=entity_names_dict[entity_code])
+    plot_daily_data(entity_df, title_str=entity_names_dict[entity_code], plot_lowess=True)
     
 #%% some regression tests
 for entity_code, entity_df in entity_df_dict.items():
