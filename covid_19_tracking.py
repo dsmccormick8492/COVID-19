@@ -50,52 +50,82 @@ def compute_lowess(x: np.array, y: np.array, is_logrithmic=True) -> np.array:
         x data.
     y : np.array
         y data.
-    is_logrithmic : TYPE, optional
+    is_logrithmic : bool, optional
         whether the y-data are logrithmically distributed. 
         If so, does the LOWESS estimate on log10(y) data. 
         The default is True.
 
     Returns
     -------
-    y_lowess : TYPE
+    y_lowess : np.array, shape (n, 2)
         LOWESS smoothed estimate of the input y data.
 
     """
+    # transform the data to log10 space
     if is_logrithmic:
         y = np.log10(y)
         
-    z_lowess = lowess(y, x, frac=1./3.)
-    # z_lowess = lowess(y, x)
+    # lower frac uses less data for the fit, 
+    y_lowess = lowess(y, x, frac=1./3.)
+    # y_lowess = lowess(y, x)
 
-    y_lowess = z_lowess[:, 1]
-
+    # back-transform the data to linear space
     if is_logrithmic:
-        y_lowess = 10**y_lowess
+        y_lowess[:, 1] = 10**y_lowess[:, 1]
         
     return y_lowess
 
 
-def plot_daily_data(df: pd.DataFrame, title_str: str, plot_lowess=False) -> None:
+def plot_daily_data_cum(df: pd.DataFrame, title_str: str, plot_trend=False) -> None:
     plt.figure(figsize=FIGURE_SIZE)
-    dates = df['date']
+    # dates = df['date']
     dates = df['datetime']
-    plt.plot(dates, df['total'], 'o', label='total', zorder=10) # plot on top
-    plt.plot(dates, df['positive'], 'o', label='positive')
-    plt.plot(dates, df['negative'], 'o', label='negative')
-    plt.plot(dates, df['death'], 'or', label='deaths')
+    plt.plot(dates, df['total'], '-ob', label='total', zorder=10) # plot on top
+    plt.plot(dates, df['positive'], '-ok', label='positive')
+    # plt.plot(dates, df['negative'], '-og', label='negative')
+    plt.plot(dates, df['death'], '-or', label='deaths')
     
-    if plot_lowess == True:
+    if plot_trend == True:
+        # use LOWESS smoothing for defining trends
         positives_lowess = compute_lowess(dates, df['positive'], is_logrithmic=True)
-        plt.plot(dates, positives_lowess, c='gray')
+        plt.plot(positives_lowess[:, 0], positives_lowess[:, 1], c='gray')
         totals_lowess = compute_lowess(dates, df['total'], is_logrithmic=True)
-        plt.plot(dates, totals_lowess, c='gray')
+        plt.plot(totals_lowess[:, 0], totals_lowess[:, 1], c='gray')
         deaths_lowess = compute_lowess(dates, df['death'], is_logrithmic=True)
-        plt.plot(dates, deaths_lowess, c='gray')
+        plt.plot(deaths_lowess[:, 0], deaths_lowess[:, 1], c='gray')
 
     plt.yscale('log')
     plt.grid(which='both', axis='both')
     plt.legend()
     plt.title(f"COVID-19 statistics for {title_str}")
+    plt.show()
+
+    
+
+def plot_daily_data_diff(df: pd.DataFrame, title_str: str, plot_trend=False) -> None:
+    plt.figure(figsize=FIGURE_SIZE)
+    # dates = df['date']
+    dates = df['datetime']
+    dates_diff = dates[1:]
+    plt.plot(dates_diff, np.diff(df['total']), '--ob', label='total', zorder=10) # plot on top
+    plt.plot(dates_diff, np.diff(df['positive']), '--ok', label='positive')
+    # plt.plot(dates_diff, np.diff(df['negative']), '--og', label='negative')
+    plt.plot(dates_diff, np.diff(df['death']), '--or', label='deaths')
+    
+    if plot_trend == True:
+        # use LOWESS smoothing for defining trends
+        positives_lowess = compute_lowess(dates, df['positive'], is_logrithmic=True)
+        plt.plot(positives_lowess[:, 0], positives_lowess[:, 1], c='gray')
+        totals_lowess = compute_lowess(dates, df['total'], is_logrithmic=True)
+        plt.plot(totals_lowess[:, 0], totals_lowess[:, 1], c='gray')
+        deaths_lowess = compute_lowess(dates, df['death'], is_logrithmic=True)
+        plt.plot(deaths_lowess[:, 0], deaths_lowess[:, 1], c='gray')
+
+    plt.yscale('log')
+    plt.grid(which='both', axis='both')
+    plt.legend()
+    plt.title(f"Daily difference COVID-19 statistics for {title_str}")
+    plt.show()
     
 
 #%% fetch data
@@ -156,7 +186,8 @@ entity_names_dict = dict(zip(entity_codes, entity_names))
 
 #%% plots!
 for entity_code, entity_df in entity_df_dict.items():
-    plot_daily_data(entity_df, title_str=entity_names_dict[entity_code], plot_lowess=True)
+    plot_daily_data_cum(entity_df, title_str=entity_names_dict[entity_code], plot_trend=False)
+    plot_daily_data_diff(entity_df, title_str=entity_names_dict[entity_code], plot_trend=False)
     
 #%% some regression tests
 for entity_code, entity_df in entity_df_dict.items():
