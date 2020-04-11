@@ -61,12 +61,13 @@ def compute_lowess(x: np.array, y: np.array, is_logrithmic=True) -> np.array:
         LOWESS smoothed estimate of the input y data.
 
     """
+    lowess_fraction = 0.25
     # transform the data to log10 space
     if is_logrithmic:
         y = np.log10(y)
         
     # lower frac uses less data for the fit, 
-    y_lowess = lowess(y, x, frac=1./3.)
+    y_lowess = lowess(y, x, frac=lowess_fraction)
     # y_lowess = lowess(y, x)
 
     # back-transform the data to linear space
@@ -80,19 +81,19 @@ def plot_daily_data_cum(df: pd.DataFrame, title_str: str, plot_trend=False) -> N
     plt.figure(figsize=FIGURE_SIZE)
     # dates = df['date']
     dates = df['datetime']
-    plt.plot(dates, df['total'], '-ob', label='total', zorder=10) # plot on top
-    plt.plot(dates, df['positive'], '-ok', label='positive')
-    # plt.plot(dates, df['negative'], '-og', label='negative')
-    plt.plot(dates, df['death'], '-or', label='deaths')
+    plt.plot(dates, df['total'], 'ob', label='total', zorder=10) # plot on top
+    plt.plot(dates, df['positive'], 'ok', label='positive')
+    # plt.plot(dates, df['negative'], 'og', label='negative')
+    plt.plot(dates, df['death'], 'or', label='deaths')
     
     if plot_trend == True:
         # use LOWESS smoothing for defining trends
-        positives_lowess = compute_lowess(dates, df['positive'], is_logrithmic=True)
-        plt.plot(positives_lowess[:, 0], positives_lowess[:, 1], c='gray')
-        totals_lowess = compute_lowess(dates, df['total'], is_logrithmic=True)
-        plt.plot(totals_lowess[:, 0], totals_lowess[:, 1], c='gray')
-        deaths_lowess = compute_lowess(dates, df['death'], is_logrithmic=True)
-        plt.plot(deaths_lowess[:, 0], deaths_lowess[:, 1], c='gray')
+        totals_lowess = compute_lowess(dates, df['total'], is_logrithmic=False)
+        plt.plot(pd.to_datetime(totals_lowess[:, 0]), totals_lowess[:, 1], c='gray')
+        positives_lowess = compute_lowess(dates, df['positive'], is_logrithmic=False)
+        plt.plot(pd.to_datetime(positives_lowess[:, 0]), positives_lowess[:, 1], c='gray')
+        deaths_lowess = compute_lowess(dates, df['death'], is_logrithmic=False)
+        plt.plot(pd.to_datetime(deaths_lowess[:, 0]), deaths_lowess[:, 1], c='gray')
 
     plt.yscale('log')
     plt.grid(which='both', axis='both')
@@ -114,11 +115,11 @@ def plot_daily_data_diff(df: pd.DataFrame, title_str: str, plot_trend=False) -> 
     
     if plot_trend == True:
         # use LOWESS smoothing for defining trends
-        positives_lowess = compute_lowess(dates, df['positive'], is_logrithmic=True)
-        plt.plot(positives_lowess[:, 0], positives_lowess[:, 1], c='gray')
-        totals_lowess = compute_lowess(dates, df['total'], is_logrithmic=True)
+        totals_lowess = compute_lowess(dates, df['total'], is_logrithmic=False)
         plt.plot(totals_lowess[:, 0], totals_lowess[:, 1], c='gray')
-        deaths_lowess = compute_lowess(dates, df['death'], is_logrithmic=True)
+        positives_lowess = compute_lowess(dates, df['positive'], is_logrithmic=False)
+        plt.plot(positives_lowess[:, 0], positives_lowess[:, 1], c='gray')
+        deaths_lowess = compute_lowess(dates, df['death'], is_logrithmic=False)
         plt.plot(deaths_lowess[:, 0], deaths_lowess[:, 1], c='gray')
 
     plt.yscale('log')
@@ -186,8 +187,8 @@ entity_names_dict = dict(zip(entity_codes, entity_names))
 
 #%% plots!
 for entity_code, entity_df in entity_df_dict.items():
-    plot_daily_data_cum(entity_df, title_str=entity_names_dict[entity_code], plot_trend=False)
-    plot_daily_data_diff(entity_df, title_str=entity_names_dict[entity_code], plot_trend=False)
+    plot_daily_data_cum(entity_df, title_str=entity_names_dict[entity_code], plot_trend=True)
+    # plot_daily_data_diff(entity_df, title_str=entity_names_dict[entity_code], plot_trend=False)
     
 #%% some regression tests
 for entity_code, entity_df in entity_df_dict.items():
