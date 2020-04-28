@@ -31,7 +31,7 @@ import scipy.stats as stats
 ### project imports
 from dataframe_from_csv_url import dataframe_from_csv_url
 import doubling
-import mcmc_regression
+# import mcmc_regression
 
 ### some constants
 DATE_COLUMN_START_INDEX = 4
@@ -92,9 +92,9 @@ deaths_totals_us = death_groups_countries['US'].iloc[:, DATE_COLUMN_START_INDEX:
 #%% Plots!
 ### confirmed cases
 plt.figure(figsize=figure_size)
-plt.plot(confirmed_dates, confirmed_totals, label='Total')
+plt.plot(confirmed_dates, confirmed_totals, c='k', label='Total')
 plt.plot(confirmed_dates, confirmed_totals_china, c='m', label='Mainland China')
-plt.plot(confirmed_dates, confirmed_totals_other, c='k', label='all rest of the world')
+plt.plot(confirmed_dates, confirmed_totals_other, c='grey', label='all rest of the world')
 plt.plot(confirmed_dates, confirmed_totals_italy, c='g', label='Italy only')
 plt.plot(confirmed_dates, confirmed_totals_france, c='r', label='France only')
 plt.plot(confirmed_dates, confirmed_totals_us, c='b', label='US only')
@@ -112,9 +112,9 @@ plt.show()
 
 ### deaths
 plt.figure(figsize=figure_size)
-plt.plot(deaths_dates, deaths_totals, label='Total')
+plt.plot(deaths_dates, deaths_totals, c='k', label='Total')
 plt.plot(deaths_dates, deaths_totals_china, c='m', label='Mainland China')
-plt.plot(deaths_dates, deaths_totals_other, c='k', label='all rest of the world')
+plt.plot(deaths_dates, deaths_totals_other, c='grey', label='all rest of the world')
 plt.plot(deaths_dates, deaths_totals_italy, c='g', label='Italy only')
 plt.plot(deaths_dates, deaths_totals_france, c='r', label='France only')
 plt.plot(deaths_dates, deaths_totals_us, c='b', label='US only')
@@ -229,7 +229,7 @@ plt.title(f"regression of US deaths since {deaths_dates_start}")
 plt.show()
 
 #%% pymc3 MCMC model for regression for deaths
-mcmc_regression.mcmc_log_regression(x_deaths, y_deaths, y_hat_deaths, slope_deaths, "US deaths")
+# mcmc_regression.mcmc_log_regression(x_deaths, y_deaths, y_hat_deaths, slope_deaths, "US deaths")
 
 #%% pymc3 MCMC model for regression for confirmed cases
 # mcmc_regression.mcmc_log_regression(x_confirmed, y_confirmed, y_hat_confirmed, slope_confirmed, "US confirmed cases")

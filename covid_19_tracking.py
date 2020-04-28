@@ -188,7 +188,7 @@ entity_names_dict = dict(zip(entity_codes, entity_names))
 #%% plots!
 for entity_code, entity_df in entity_df_dict.items():
     plot_daily_data_cum(entity_df, title_str=entity_names_dict[entity_code], plot_trend=True)
-    # plot_daily_data_diff(entity_df, title_str=entity_names_dict[entity_code], plot_trend=False)
+    plot_daily_data_diff(entity_df, title_str=entity_names_dict[entity_code], plot_trend=False)
     
 #%% some regression tests
 for entity_code, entity_df in entity_df_dict.items():
